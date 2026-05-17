@@ -1,0 +1,13 @@
+<Application x:Class="RasterRotation.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="OnStartup">
+    <Application.Resources>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F3F5F7"/>
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#1E252B"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#66717D"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#1D6F8F"/>
+        <SolidColorBrush x:Key="ViewportBrush" Color="#DCE2E8"/>
+    </Application.Resources>
+</Application>

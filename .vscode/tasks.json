@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build solution",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}\\RasterRotation.sln"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "run wpf",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}\\src\\RasterRotation.Wpf"
+      ],
+      "dependsOn": "build solution",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "cli help",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}\\src\\RasterRotation.Cli",
+        "--",
+        "--help"
+      ],
+      "dependsOn": "build solution",
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
