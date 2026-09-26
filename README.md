@@ -52,6 +52,8 @@ dotnet run --project .\src\RasterRotation.Cli -- "C:\Images\scan.tiff" --rotate 
 
 Для демонстрации командной строки также есть notebook: `docs/cli-demo.ipynb`.
 
+Подробная русскоязычная карта архитектуры, файлов, точек входа и форматов находится в `docs/PROJECT_ROADMAP_RU.md`.
+
 ## Горячие клавиши
 
 - `Ctrl+O` - открыть изображение;

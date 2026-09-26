@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using RasterRotation.Core;
 
@@ -30,6 +31,8 @@ public partial class MainWindow : Window
     private string? _currentPath;
     private bool _cropMode;
     private Point? _cropStart;
+    private BitmapSource? _freeRotationBaseBitmap;
+    private double _freeRotationTotalAngle;
 
     public MainWindow(string? initialFile)
     {
@@ -154,8 +157,18 @@ public partial class MainWindow : Window
             return;
         }
 
-        var background = GetRotationBackground();
-        var rotated = _transformer.RotateFree(_document.Bitmap, angle, background);
+        if (Math.Abs(angle) < 0.0001)
+        {
+            return;
+        }
+
+        _freeRotationBaseBitmap ??= _document.Bitmap;
+        _freeRotationTotalAngle += angle;
+
+        var rotated = CreateFreeRotationResult(
+            _freeRotationBaseBitmap,
+            _freeRotationTotalAngle,
+            GetRotationBackground());
         _document.ReplaceBitmap(rotated, angle);
         AngleSlider.Value = 0;
         AngleTextBox.Text = "0";
@@ -252,6 +265,7 @@ public partial class MainWindow : Window
         }
 
         var cropped = _transformer.Crop(_document.Bitmap, crop.Value);
+        ResetFreeRotationSession();
         _document.ReplaceBitmap(cropped);
         UpdatePreview();
     }
@@ -262,6 +276,7 @@ public partial class MainWindow : Window
         {
             _document = _fileService.Load(filePath);
             _currentPath = filePath;
+            ResetFreeRotationSession();
             _document.Changed += (_, _) => UpdateStatus();
             UpdatePreview();
             DetailsTextBlock.Text = "Изображение загружено. Доступны обрезка, отражение и поворот.";
@@ -316,6 +331,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        ResetFreeRotationSession();
         var rotated = _transformer.RotateRightAngle(_document.Bitmap, degrees);
         _document.ReplaceBitmap(rotated, degrees);
         UpdatePreview();
@@ -328,8 +344,46 @@ public partial class MainWindow : Window
             return;
         }
 
+        ResetFreeRotationSession();
         _document.ReplaceBitmap(transform(_document.Bitmap));
         UpdatePreview();
+    }
+
+    private BitmapSource CreateFreeRotationResult(BitmapSource source, double totalAngle, Color background)
+    {
+        var normalized = totalAngle % 360;
+        if (normalized < 0)
+        {
+            normalized += 360;
+        }
+
+        if (Math.Abs(normalized) < 0.0001 || Math.Abs(normalized - 360) < 0.0001)
+        {
+            return source;
+        }
+
+        if (Math.Abs(normalized - 90) < 0.0001)
+        {
+            return _transformer.RotateRightAngle(source, 90);
+        }
+
+        if (Math.Abs(normalized - 180) < 0.0001)
+        {
+            return _transformer.RotateRightAngle(source, 180);
+        }
+
+        if (Math.Abs(normalized - 270) < 0.0001)
+        {
+            return _transformer.RotateRightAngle(source, 270);
+        }
+
+        return _transformer.RotateFree(source, normalized, background);
+    }
+
+    private void ResetFreeRotationSession()
+    {
+        _freeRotationBaseBitmap = null;
+        _freeRotationTotalAngle = 0;
     }
 
     private void UpdatePreview()
